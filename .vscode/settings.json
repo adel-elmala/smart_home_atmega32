@@ -1,0 +1,22 @@
+{
+  "files.associations": {
+    "dio_interface.h": "c",
+    "datatypes.h": "c",
+    "external_int_interface.h": "c",
+    "timer.h": "c",
+    "pwm_interface.h": "c",
+    "adc_interface.h": "c",
+    "lm35_interface.h": "c",
+    "uart_interface.h": "c",
+    "lcd_interface.h": "c",
+    "dio_reg.h": "c",
+    "test.h": "c",
+    "spi_interface.h": "c",
+    "stopwatch_interface.h": "c",
+    "twi_interface.h": "c",
+    "ultrasonic_interface.h": "c",
+    "ultrasonic_private.h": "c",
+    "servo_interface.h": "c",
+    "calcbit.h": "c"
+  }
+}

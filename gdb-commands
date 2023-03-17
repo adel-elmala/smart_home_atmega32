@@ -1,0 +1,2 @@
+file ./bin/main.elf
+target remote localhost:1234
