@@ -17,6 +17,7 @@
     "ultrasonic_interface.h": "c",
     "ultrasonic_private.h": "c",
     "servo_interface.h": "c",
-    "calcbit.h": "c"
+    "calcbit.h": "c",
+    "mp_private.h": "c"
   }
 }

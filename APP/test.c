@@ -14,10 +14,10 @@
 
 #include "../LIB/Queue/Queue.h"
 
-// #include "../HAL/FingerPrint/FP_Interface.h"
+#include "../HAL/FingerPrint/FP_Interface.h"
 
 // #include "../MCAL/EEPROM/EEPROM_Interface.h"
-#include "../MCAL/StopWatch/StopWatch_Interface.h"
+// #include "../MCAL/StopWatch/StopWatch_Interface.h"
 #include <stdio.h>
 // #include "../HAL/UltraSonic/UltraSonic_Interface.h"
 
@@ -285,60 +285,60 @@
 //     while (1)
 //         ;
 // }
-// void test_fp()
-// {
-//     lcd_init();
-//     FP_Init();
-//     // lcd_displayString("READY");
-//     // lcd_displayString("init done");
+void test_fp()
+{
+    lcd_init();
+    FP_Init();
+    // lcd_displayString("READY");
+    // lcd_displayString("init done");
 
-//     // uint8 status = FP_Verify_Password(9);
-//     uint8 thumb_id = 1;
-//     uint8 index_id = 2;
-//     uint8 middle_id = 3;
-//     FP_Save_Finger_Print(thumb_id);
-//     FP_Save_Finger_Print(index_id);
-//     FP_Save_Finger_Print(middle_id);
-//     // uint8 match_str[10] = {0};
-//     while (1)
-//     {
+    // uint8 status = FP_Verify_Password(9);
+    uint8 thumb_id = 1;
+    uint8 index_id = 2;
+    uint8 middle_id = 3;
+    FP_Save_Finger_Print(thumb_id);
+    FP_Save_Finger_Print(index_id);
+    FP_Save_Finger_Print(middle_id);
+    // uint8 match_str[10] = {0};
+    while (1)
+    {
 
-//         uint16 match = FP_Match_Finger_Print();
-//         // sprintf((char *)match_str, "%d", match);
-//         lcd_sendData(match);
-//         TIMER0_Delay_ms_with_Blocking(3000);
+        uint16 match = FP_Match_Finger_Print();
+        // sprintf((char *)match_str, "%d", match);
+        lcd_sendData(match);
+        TIMER0_Delay_ms_with_Blocking(3000);
 
-//         lcd_clearAndHome();
-//         switch (match)
-//         {
-//         case 1:
-//         {
-//             lcd_displayString("Thumb Finger");
-//             break;
-//         }
+        lcd_clearAndHome();
+        switch (match)
+        {
+        case 1:
+        {
+            lcd_displayString("Thumb Finger");
+            break;
+        }
 
-//         case 2:
-//         {
-//             lcd_displayString("Index Finger");
-//             break;
-//         }
+        case 2:
+        {
+            lcd_displayString("Index Finger");
+            break;
+        }
 
-//         case 3:
-//         {
-//             lcd_displayString("Middle Finger");
-//             break;
-//         }
+        case 3:
+        {
+            lcd_displayString("Middle Finger");
+            break;
+        }
 
-//         default:
-//         {
-//             lcd_displayString("No match");
+        default:
+        {
+            lcd_displayString("No match");
 
-//             break;
-//         }
-//         }
-//         TIMER0_Delay_ms_with_Blocking(5000);
-//     }
-// }
+            break;
+        }
+        }
+        TIMER0_Delay_ms_with_Blocking(5000);
+    }
+}
 
 // void test_servo()
 // {
@@ -359,40 +359,40 @@
 //     }
 // }
 
-void test_stopwatch()
-{
-    StopWatch_t clk;
-    uint8 str[12] = {0};
+// void test_stopwatch()
+// {
+//     StopWatch_t clk;
+//     uint8 str[12] = {0};
 
-    lcd_init();
-    TIMER0_SetConfig();
-    DIO_vSetPortDirection(PORTC, OUTPUT);
+//     lcd_init();
+//     TIMER0_SetConfig();
+//     DIO_vSetPortDirection(PORTC, OUTPUT);
 
-    StopWatch_Init();
-    StopWatch_Start(&clk);
+//     StopWatch_Init();
+//     StopWatch_Start(&clk);
 
-    while (1)
-    {
-        TIMER0_Delay_ms_with_Blocking(3000);
-        StopWatch_Snap(&clk);
-        // DIO_vTogglePin(PORTC, PIN0);
+//     while (1)
+//     {
+//         TIMER0_Delay_ms_with_Blocking(3000);
+//         StopWatch_Snap(&clk);
+//         // DIO_vTogglePin(PORTC, PIN0);
 
-        lcd_clearAndHome();
+//         lcd_clearAndHome();
 
-        sprintf(str, "%d", clk.seconds);
-        lcd_displayString("Sec: ");
-        lcd_displayString(str);
+//         sprintf(str, "%d", clk.seconds);
+//         lcd_displayString("Sec: ");
+//         lcd_displayString(str);
 
-        sprintf(str, "%d", clk.milli_seconds);
-        lcd_displayString("  mSec: ");
-        lcd_displayString(str);
+//         sprintf(str, "%d", clk.milli_seconds);
+//         lcd_displayString("  mSec: ");
+//         lcd_displayString(str);
 
-        lcd_goto_line2();
-        sprintf(str, "%d", clk.u_seconds);
-        lcd_displayString("uSec: ");
-        lcd_displayString(str);
-    }
-}
+//         lcd_goto_line2();
+//         sprintf(str, "%d", clk.u_seconds);
+//         lcd_displayString("uSec: ");
+//         lcd_displayString(str);
+//     }
+// }
 
 // void test_ultrasonic()
 // {

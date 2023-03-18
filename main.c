@@ -1,4 +1,4 @@
-// #include "APP/test.h"
+#include "APP/test.h"
 #include "APP/MP_Interface.h"
 int main()
 {
@@ -23,7 +23,7 @@ int main()
     // project_slave_app();
     // test_eeprom_write();
     // test_eeprom_read();
-    // test_fp();
+    test_fp();
     // test_servo();
     // test_stopwatch();
     // test_ultrasonic();
@@ -31,6 +31,7 @@ int main()
     // mega_app_init();
     // mega_app_start();
     // MP_vInit();
-    MP_vStart();
+    // MP_vStart();
+    // MP_vInit_FIRST_TIME();
     return 0;
 }

@@ -6,9 +6,23 @@
 #include "../HAL/LM35/LM35_Interface.h"
 #include "../HAL/UltraSonic/UltraSonic_Interface.h"
 #include "../HAL/OLED/OLED_Interface.h"
+#include "../HAL/FingerPrint/FP_Interface.h"
 #include <stdio.h>
 
 MP_Sys_State_t g_state = {0};
+
+void MP_vInit_FIRST_TIME()
+{
+    TIMER0_SetConfig();
+    lcd_init();
+    // OLED_StoreFont();
+    lcd_displayString("WAITING!");
+    FP_Init();
+    FP_Save_Finger_Print(FP_Adel);
+    FP_Save_Finger_Print(FP_Husseny);
+    FP_Save_Finger_Print(FP_Omar);
+    FP_Save_Finger_Print(FP_Youssef);
+}
 void MP_vInit()
 {
     TIMER0_SetConfig();
@@ -19,6 +33,12 @@ void MP_vInit()
     // OLED_StoreFont();
     OLED_vInit();
     OLED_ClearDisplay();
+
+    FP_Init();
+    // FP_Save_Finger_Print(FP_Adel);
+    // FP_Save_Finger_Print(FP_Husseny);
+    // FP_Save_Finger_Print(FP_Omar);
+    // FP_Save_Finger_Print(FP_Youssef);
 
     DIO_vSetPinDirection(FAN_PORT, FAN_PIN, OUTPUT);
     DIO_vSetPinDirection(BUZZER_PORT, BUZZER_PIN, OUTPUT);
@@ -151,6 +171,49 @@ void MP_vUpdate_count_state()
         DIO_vWritePin(PORTA, PIN4, HIGH);
     }
 }
+
+void MP_vFingerPrint()
+{
+    uint16 match_id = FP_Match_Finger_Print();
+    switch (match_id)
+    {
+    case FP_Adel:
+    {
+        OLED_sendStr_xy("Welcome Adel!", 2, 0);
+        g_state.fp_owner_name = "Adel";
+        break;
+    }
+    case FP_Husseny:
+    {
+        OLED_sendStr_xy("Welcome Husseny!", 2, 0);
+        g_state.fp_owner_name = "Husseny";
+
+        break;
+    }
+    case FP_Omar:
+    {
+        OLED_sendStr_xy("Welcome Omar!", 2, 0);
+        g_state.fp_owner_name = "Omar";
+
+        break;
+    }
+    case FP_Youssef:
+    {
+        OLED_sendStr_xy("Welcome Youssef!", 2, 0);
+        g_state.fp_owner_name = "Youssef";
+
+        break;
+    }
+
+    default:
+    {
+        OLED_sendStr_xy("WHO ARE YOU?", 2, 0);
+        g_state.fp_owner_name = "NONE";
+        break;
+    }
+    }
+}
+
 void MP_vStart()
 {
     // read temp
@@ -168,7 +231,7 @@ void MP_vStart()
 
         // ultrasonic counting people
         MP_vUpdate_count_state();
-#if 1
+#if 0
         uint8 str[16] = {0};
         sprintf(str, "%d", g_state.n_person_in_house);
         lcd_displayString(str);
@@ -176,6 +239,7 @@ void MP_vStart()
         lcd_clearAndHome();
 #endif
         // fp , display state on oled
+        MP_vFingerPrint();
         // rfid + servo
         // push button shutsdown system
     }

@@ -7,13 +7,11 @@ typedef struct MP_SYS_STATE
     /* data */
     uint16 temprature;
     uint8 n_person_in_house;
+    char *fp_owner_name;
 } MP_Sys_State_t;
 
 void MP_vInit();
 void MP_vStart();
-void MP_vMonitor_temprature(void);
-void MP_vUltrasonic_Count();
-uint8 MP_vUltrasonic_Person_State();
-void MP_vUpdate_count_state();
+void MP_vInit_FIRST_TIME();
 
 #endif
