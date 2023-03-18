@@ -129,6 +129,17 @@ void OLED_ClearDisplay(void)
     }
 }
 
+void OLED_Clearliney(int y)
+{
+    OLED_Set_xy(y, 0);
+    {
+        for (uint8 i = 0; i < 128; i++) // clear all COL
+        {
+            OLED_SendChar(0); // clear all COL
+        }
+    }
+}
+
 void OLED_ResetDisplay(void)
 {
     OLED_DisplayOff();
@@ -136,17 +147,17 @@ void OLED_ResetDisplay(void)
     OLED_DisplayOn();
 }
 
-void OLED_StoreFont(void)
-{
-    uint16 EEPromAddressCountner = 0;
-    for (uint8 i = 0; i < sizeof(myFont1) / 8; i++)
-    {
-        for (uint8 j = 0; j < 8; j++)
-        {
-            // LCD_4_bitSendChar(myFont1[i][j]);
-            lcd_sendData(myFont1[i][j]);
-            EEPROM_enuWrite(EEPromAddressCountner, myFont1[i][j]);
-            EEPromAddressCountner++;
-        }
-    }
-}
+// void OLED_StoreFont(void)
+// {
+//     uint16 EEPromAddressCountner = 0;
+//     for (uint8 i = 0; i < sizeof(myFont1) / 8; i++)
+//     {
+//         for (uint8 j = 0; j < 8; j++)
+//         {
+//             // LCD_4_bitSendChar(myFont1[i][j]);
+//             lcd_sendData(myFont1[i][j]);
+//             EEPROM_enuWrite(EEPromAddressCountner, myFont1[i][j]);
+//             EEPromAddressCountner++;
+//         }
+//     }
+// }

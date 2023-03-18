@@ -1,8 +1,6 @@
 #include "LCD_Interface.h"
-// #define F_CPU 16000000UL
-// #define F_CPU 8000000UL
 #include "../../MCAL/TIMER/timer.h"
-// #include <util/delay.h>
+
 void enablePulse(void)
 {
     DIO_vWritePin(LCD_CONTROL_PORT, LCD_CONTROL_E, HIGH);

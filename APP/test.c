@@ -5,7 +5,7 @@
 // #include "../MCAL/PWM/PWM_Interface.h"
 // #include "../MCAL/ADC/ADC_Interface.h"
 #include "../MCAL/UART/UART_Interface.h"
-// #include "../MCAL/SPI/SPI_Interface.h"
+// #include "../MCAL/SPI/SPI.h"
 // #include "../MCAL/TWI/TWI_Interface.h"
 
 // #include "../HAL/L298_H_Bridge/L298_H_Bridge_Interface.h"
@@ -15,7 +15,7 @@
 #include "../LIB/Queue/Queue.h"
 
 #include "../HAL/FingerPrint/FP_Interface.h"
-
+// #include "../HAL/RFID/RFID.h"
 // #include "../MCAL/EEPROM/EEPROM_Interface.h"
 // #include "../MCAL/StopWatch/StopWatch_Interface.h"
 #include <stdio.h>
@@ -424,3 +424,94 @@ void test_fp()
 //         ;
 //     }
 // }
+#if 0
+void test_rfid()
+{
+    lcd_init();
+    lcd_displayString("h");
+    Servo_vInit();
+    uint8 index = 0;
+    // const uint32 IDVALUE=0X495BCAB1;
+    const uint32 IDVALUE = 0XE979E9B3;
+    uint8 CardId[4] = {0, 0, 0, 0};
+    uint8 Status_ID = 0;
+    lcd_displayString("e");
+
+    lcd_displayString("l");
+    SPI_Init();
+    RFID_INIT();
+    DIO_vSetPinDirection(PORTA, PIN4, OUTPUT);
+    DIO_vSetPinDirection(PORTA, PIN5, OUTPUT);
+    DIO_vSetPinDirection(PORTA, PIN6, OUTPUT);
+    DIO_vSetPinDirection(PORTC, PIN6, OUTPUT);
+
+    // uint8 s1[2];
+    // uint8 s2[2];
+    // uint8 s3[2];
+    // uint8 s4[2];
+    if (getFirmwareVersion() == 0x92)
+    {
+        DIO_vWritePin(PORTA, PIN4, HIGH);
+        TIMER0_Delay_ms_with_Blocking(500);
+        DIO_vWritePin(PORTA, PIN4, LOW);
+        TIMER0_Delay_ms_with_Blocking(500);
+    }
+    lcd_displayString("o");
+
+    while (1)
+    {
+        if (DetectCard())
+        {
+            lcd_displayString("det");
+
+            DIO_vWritePin(PORTA, PIN5, HIGH);
+            TIMER0_Delay_ms_with_Blocking(500);
+            DIO_vWritePin(PORTA, PIN5, LOW);
+            TIMER0_Delay_ms_with_Blocking(500);
+            Status_ID = GetCardId(CardId);
+            uint32 IDX = ((uint32)(CardId[3])) | ((uint32)(CardId[2]) << 8) | ((uint32)(CardId[1]) << 16) | ((uint32)(CardId[0]) << 24);
+            if (IDX == IDVALUE)
+            {
+                // LCD_writeData('R');
+                // LCD_writestring("RIGHT",0,0);
+                DIO_vWritePin(PORTC, PIN6, HIGH);
+                TIMER0_Delay_ms_with_Blocking(500);
+                DIO_vWritePin(PORTC, PIN6, LOW);
+                TIMER0_Delay_ms_with_Blocking(500);
+                lcd_goto(LCD_LINE_1, LCD_COL_1);
+                lcd_displayString("ID IS RIGHT");
+                // lcd_clearAndHome();
+                lcd_goto(LCD_LINE_3, LCD_COL_1);
+                lcd_displayString("DOOR OPEN    ");
+
+                Servo_vSetAngle(0);
+                TIMER0_Delay_ms_with_Blocking(500);
+                Servo_vSetAngle(90);
+                TIMER0_Delay_ms_with_Blocking(500);
+            }
+            else
+            {
+                DIO_vWritePin(PORTC, PIN6, HIGH);
+                TIMER0_Delay_ms_with_Blocking(500);
+                DIO_vWritePin(PORTC, PIN6, LOW);
+                TIMER0_Delay_ms_with_Blocking(500);
+                DIO_vWritePin(PORTC, PIN6, HIGH);
+                TIMER0_Delay_ms_with_Blocking(500);
+                DIO_vWritePin(PORTC, PIN6, LOW);
+                TIMER0_Delay_ms_with_Blocking(500);
+                // LCD_writeData('W');
+                // LCD_writestring("WRONG",0,0);
+                lcd_goto(LCD_LINE_3, LCD_COL_1);
+                lcd_displayString("ID IS WRONG    ");
+            }
+        }
+        else if (!DetectCard())
+        {
+            DIO_vWritePin(PORTA, PIN6, HIGH);
+            TIMER0_Delay_ms_with_Blocking(500);
+            DIO_vWritePin(PORTA, PIN6, LOW);
+            TIMER0_Delay_ms_with_Blocking(500);
+        }
+    }
+}
+#endif

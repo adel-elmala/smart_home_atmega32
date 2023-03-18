@@ -17,5 +17,6 @@ void test_servo();
 void test_stopwatch();
 void test_ultrasonic();
 void test_oled();
+void test_rfid();
 
 #endif

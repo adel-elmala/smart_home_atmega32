@@ -5,21 +5,21 @@
 #include "../LCD/LCD_Interface.h"
 #include "../../LIB/Queue/Queue.h"
 
-UART_Config_t uart_conf_fp = {
-    57600, // uint16 baud_rate;
-    // 9600,                                           // uint16 baud_rate;
-    UART_DISABLE_DOUBLE_TRANSMISSION_SPEED,         // uint8 enable_double_transmission_speed;
-    UART_DISABLE_MULTIPROCESSOR_COMMUNICATION_MODE, // uint8 enable_multiprocessor_mode;
-    UART_DISABLE_RECEIVE_COMPLETE_INTERRUPT,        // uint8 enable_recevie_complete_interrupt;
-    UART_DISABLE_TRANSMIT_COMPLETE_INTERRUPT,       // uint8 enable_transmit_complete_interrupt;
-    UART_DISABLE_DATA_REG_EMPTY_COMPLETE_INTERRUPT, // uint8 enable_data_reg_empty_complete_interrupt;
-    UART_ENABLE_RECEIVER,                           // uint8 enable_receiver;
-    UART_ENABLE_TRANSMITER,                         // uint8 enable_transmiter;
-    UART_8BIT_CHAR_SIZE,                            // uint8 frame_data_bits_size;
-    UART_DISABLE_PARITY,                            // uint8 parity_mode;
-    UART_1_BIT_STOP                                 // uint8 stop_bits_mode;
+// UART_Config_t uart_conf_fp = {
+//     57600, // uint16 baud_rate;
+//     // 9600,                                           // uint16 baud_rate;
+//     UART_DISABLE_DOUBLE_TRANSMISSION_SPEED,         // uint8 enable_double_transmission_speed;
+//     UART_DISABLE_MULTIPROCESSOR_COMMUNICATION_MODE, // uint8 enable_multiprocessor_mode;
+//     UART_DISABLE_RECEIVE_COMPLETE_INTERRUPT,        // uint8 enable_recevie_complete_interrupt;
+//     UART_DISABLE_TRANSMIT_COMPLETE_INTERRUPT,       // uint8 enable_transmit_complete_interrupt;
+//     UART_DISABLE_DATA_REG_EMPTY_COMPLETE_INTERRUPT, // uint8 enable_data_reg_empty_complete_interrupt;
+//     UART_ENABLE_RECEIVER,                           // uint8 enable_receiver;
+//     UART_ENABLE_TRANSMITER,                         // uint8 enable_transmiter;
+//     UART_8BIT_CHAR_SIZE,                            // uint8 frame_data_bits_size;
+//     UART_DISABLE_PARITY,                            // uint8 parity_mode;
+//     UART_1_BIT_STOP                                 // uint8 stop_bits_mode;
 
-};
+// };
 
 UART_Config_t uart_conf_fp_async = {
     57600, // uint16 baud_rate;

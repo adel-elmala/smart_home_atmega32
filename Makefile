@@ -1,92 +1,60 @@
-# SRC = 	main.c\
-		LIB/Queue/Queue.c\
-		APP/application.c\
-		APP/calculator.c\
-		APP/smart_fan.c\
-		APP/com_project_master.c\
-		APP/com_project_slave.c\
-		APP/test.c\
-		MCAL/GIE/GIE.c\
-		MCAL/DIO/dio.c\
-		MCAL/EXT_INT/External_INT.c\
-		MCAL/TIMER/timer.c\
-		MCAL/PWM/PWM.c\
-		MCAL/ADC/ADC.c\
-		MCAL/UART/UART.c\
-		MCAL/SPI/SPI.c\
-		MCAL/TWI/TWI.c\
-		HAL/KeyPad/Keypad.c\
-		HAL/LCD/LCD.c\
-		HAL/L298_H_Bridge/L298_H_Bridge.c\
-		HAL/LM35/LM35.c\
+mcu1_hal = ./HAL/FingerPrint/FP.c ./HAL/OLED/OLED.c ./HAL/RFID/RFID.c ./HAL/LCD/LCD.c
 
-SRC = 	main.c\
-		APP/test.c\
-		APP/mega-project.c\
-		HAL/FingerPrint/FP.c\
-		HAL/LCD/LCD.c\
-		HAL/UltraSonic/UltraSonic.c\
-		LIB/Queue/Queue.c\
-		MCAL/GIE/GIE.c\
-		MCAL/DIO/dio.c\
-		MCAL/TIMER/timer.c\
-		MCAL/PWM/PWM.c\
-		MCAL/UART/UART.c\
-		MCAL/EXT_INT/External_INT.c\
-		MCAL/StopWatch/StopWatch.c\
-		HAL/Servo/Servo.c\
-		HAL/LM35/LM35.c\
-		MCAL/ADC/ADC.c\
-		# MCAL/EEPROM/EEPROM.c\
-		# MCAL/TWI/TWI.c\
-		# HAL/OLED/OLED.c\
-		# MCAL/SPI/SPI.c\
+mcu1_mcal = ./MCAL/EEPROM_Internal/EEPROM.c  ./MCAL/I2C/I2C.c\
+			./MCAL/SPI/SPI.c ./MCAL/UART/UART.c ./MCAL/TIMER/timer.c ./MCAL/GIE/GIE.c ./MCAL/DIO/dio.c
+
+mcu1_lib = ./LIB/Queue/Queue.c
+
+mcu1_app = ./APP/mcu_1/MP.c
+
+
+SRC = main.c $(mcu1_app) $(mcu1_hal) $(mcu1_mcal) $(mcu1_lib)
 
 
 OBJ = $(subst .c,.o, $(SRC))
 
+
+
 MCU = atmega32
 FLASHER = usbasp
-# F_CPU = 1000000UL 
-# F_CPU = 8000000UL 
 F_CPU = 16000000UL 
-# BAUD  = 9600UL
-HFUSE = 0xc2
-HFUSE_BITS = hfuse:w:$(HFUSE):m
 
-# CFLAGS = -Og -ggdb -Wall -mmcu=$(MCU)  
-# CFLAGS = -Og -ggdb -Wall -mmcu=$(MCU) -DF_CPU=$(F_CPU) -DBAUD=$(BAUD)
-CFLAGS = -Og -ggdb -Wall -mmcu=$(MCU) -DF_CPU=$(F_CPU) 
-# CFLAGS += -Wno-pointer-sign #disable pointer mismatch warning
+HFUSE_BITS = 0xc2
+HFUSE = hfuse:w:$(HFUSE_BITS):m
+AVRDUDE_ARGS = HFUSE
+
+CFLAGS = -Os -ggdb -Wall -mmcu=$(MCU) -DF_CPU=$(F_CPU)  
+CFLAGS += -Wno-pointer-sign -Wno-strict-aliasing #disable pointer mismatch warning
 
 INCLUDE  = -I./utils
 INCLUDE += -I./MCAL
 INCLUDE += -I./HAL
-INCLUDE += -I/lib/avr/include
 
-# LD_AVR = -L/lib/avr/lib/avr5 -latmega32a
-LD_AVR = 
-
+# avr lib
+LD_AVR =  
+TARGET = mcu1
 all: compile build flash
 
 # default:
 # 	@echo $(filter %led,$(SRC))
+
+compile:$(TARGET)
+
+$(TARGET):$(OBJ)
+	@avr-gcc $(CFLAGS) $(INCLUDE) $(LD_AVR) $(OBJ)  -o ./bin/$@.elf
 	
-compile:$(OBJ)
-	
-	@avr-gcc $(CFLAGS) $(INCLUDE) $(LD_AVR) $(OBJ)  -o ./bin/main.elf
 %.o:%.c
 	@echo "compiling $^"
 	@avr-gcc $(CFLAGS) $(INCLUDE) $(LD_AVR) $^ -c  -o $@ 
 
 build:
 	@echo " building Hex file ... "
+	@avr-objcopy  -j .text -j .data -O ihex ./bin/$(TARGET).elf ./bin/$(TARGET).hex
 
-	@avr-objcopy  -j .text -j .data -O ihex ./bin/main.elf ./bin/main.hex
 
 flash:build
-	avrdude -c $(FLASHER) -p $(MCU)  -U flash:w:./bin/main.hex
-	# avrdude -c $(FLASHER) -p $(MCU) -U $(HFUSE_BITS) -U flash:w:./bin/main.hex
+	avrdude -c $(FLASHER) -p $(MCU) -U $(AVRDUDE_ARGS) -U flash:w:./bin/$(TARGET).hex -F
+	# avrdude -c $(FLASHER) -p $(MCU)  -U flash:w:./bin/$(TARGET).hex 
 
 clean:
 	$(foreach file,$(OBJ),$(shell rm $(file)))

@@ -18,6 +18,12 @@
     "ultrasonic_private.h": "c",
     "servo_interface.h": "c",
     "calcbit.h": "c",
-    "mp_private.h": "c"
+    "mp_private.h": "c",
+    "spi.h": "c",
+    "spi_reg.h": "c",
+    "timer1_interface.h": "c",
+    "fp_interface.h": "c",
+    "oled_interface.h": "c",
+    "mp_interface.h": "c"
   }
 }

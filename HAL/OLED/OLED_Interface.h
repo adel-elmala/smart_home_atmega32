@@ -54,5 +54,6 @@ void OLED_sendEmoji_xy(uint8 *String, uint16 Length, int Row, int Col);
 void OLED_ClearDisplay(void);
 void OLED_ResetDisplay(void);
 void OLED_StoreFont(void);
+void OLED_Clearliney(int y);
 
 #endif
