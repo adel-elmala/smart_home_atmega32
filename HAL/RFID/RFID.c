@@ -223,14 +223,14 @@ uint8 DetectCard()
     ClearBitMask(CollReg, 0x80);
     uint8 command[1] = {0x26};
     // Transceive_CMD:transmit and recive comm & command==0x26 & length of command arrary & back data(buffer) & length of back data & validBits & crc erorr
-    while (!Communicate(Transceive_CMD, command, 1, buffer, &len, &validBits, 0))
+    if (!Communicate(Transceive_CMD, command, 1, buffer, &len, &validBits, 0))
     {
         // wait until some card
-        DIO_vWritePin(PORTA, PIN6, HIGH);
-        TIMER0_Delay_ms_with_Blocking(500);
-        DIO_vWritePin(PORTA, PIN6, LOW);
-        TIMER0_Delay_ms_with_Blocking(500);
-        //    	return 0;
+        // DIO_vWritePin(PORTA, PIN6, HIGH);
+        // TIMER0_Delay_ms_with_Blocking(500);
+        // DIO_vWritePin(PORTA, PIN6, LOW);
+        // TIMER0_Delay_ms_with_Blocking(500);
+        return 0;
     }
     if (len != 2 || validBits != 0)
     {

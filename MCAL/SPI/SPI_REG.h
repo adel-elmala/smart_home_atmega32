@@ -43,7 +43,7 @@
 #define BIT7 7
 
 /*-----PORTB------*/
-#define SS 4
+#define SS 3
 #define MOSI 5
 #define MISO 6
 #define SCK 7

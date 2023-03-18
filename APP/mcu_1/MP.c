@@ -9,15 +9,15 @@
 #include "../../MCAL/SPI/SPI.h"
 #include "../../MCAL/TIMER/timer.h"
 
-// #include <stdio.h>
-
 void MP_vInit_FIRST_TIME()
 {
     TIMER0_SetConfig();
     lcd_init();
     // OLED_StoreFont();
     lcd_displayString("WAITING!");
+
     FP_Init();
+
     FP_Save_Finger_Print(1);
     FP_Save_Finger_Print(2);
     FP_Save_Finger_Print(3);
@@ -30,42 +30,62 @@ void MP_vInit()
     OLED_vInit();
     OLED_ClearDisplay();
     SPI_Init();
-    // RFID_INIT();
+    RFID_INIT();
     FP_Init();
 
-    DIO_vSetPinDirection(FAN_PORT, FAN_PIN, OUTPUT);
-    DIO_vSetPinDirection(BUZZER_PORT, BUZZER_PIN, OUTPUT);
+    DIO_vSetPinDirection(SYS_ENABLE_PORT, SYS_ENABLE_PIN, OUTPUT);
+    DIO_vSetPinDirection(SYS_SHUTDOWN_PORT, SYS_SHUTDOWN_PIN, OUTPUT);
 
-    // DIO_vSetPinDirection(PORTA, PIN4, OUTPUT);
-    // DIO_vSetPinDirection(PORTA, PIN5, OUTPUT);
-    // DIO_vSetPinDirection(PORTA, PIN6, OUTPUT);
-    // DIO_vSetPinDirection(PORTC, PIN6, OUTPUT);
+    // rfid pins
+    DIO_vSetPinDirection(PORTA, PIN4, OUTPUT);
+    DIO_vSetPinDirection(PORTA, PIN5, OUTPUT);
+    DIO_vSetPinDirection(PORTA, PIN6, OUTPUT);
+    DIO_vSetPinDirection(PORTC, PIN6, OUTPUT);
 }
 
-void MP_vFingerPrint()
+bool MP_vFingerPrint()
 {
     uint16 match_id = FP_Match_Finger_Print();
+    bool result;
     if (match_id == 1)
+    {
         OLED_sendStr_xy((uint8 *)"Welcome Adel!", 2, 0);
+        result = true;
+    }
 
     else if (match_id == 2)
-        OLED_sendStr_xy((uint8 *)"Adel!", 2, 0);
+    {
+        OLED_sendStr_xy((uint8 *)"Welcome Adel!", 2, 0);
+        result = true;
+    }
     else if (match_id == 3)
-        OLED_sendStr_xy((uint8 *)"hus!", 2, 0);
-
+    {
+        OLED_sendStr_xy((uint8 *)"Welcome Husseny!", 2, 0);
+        result = true;
+    }
     else if (match_id == 4)
-        OLED_sendStr_xy((uint8 *)"omar!", 2, 0);
+    {
+        OLED_sendStr_xy((uint8 *)"Welcome Omar!", 2, 0);
+        result = true;
+    }
     else
-        OLED_sendStr_xy((uint8 *)"???", 2, 0);
+    {
+        OLED_sendStr_xy((uint8 *)"No Match!", 2, 0);
+        result = false;
+    }
+    return result;
 }
-#if 0
-void MP_vRFID()
+
+bool MP_vRFID()
 {
-    uint8 index = 0;
     // const uint32 IDVALUE=0X495BCAB1;
-    const uint32 IDVALUE = 0XE979E9B3;
+    // const uint32 IDVALUE = 0XE979E9B3;
+    const uint32 IDVALUE = 0X73643d6;
+    // const uint32 IDVALUE = 0X77f6f1d8;
     uint8 CardId[4] = {0, 0, 0, 0};
     uint8 Status_ID = 0;
+    bool status = false;
+    // lcd_displayString("rfid");
 
     if (getFirmwareVersion() == 0x92)
     {
@@ -75,9 +95,11 @@ void MP_vRFID()
         TIMER0_Delay_ms_with_Blocking(500);
     }
 
+    // lcd_displayString("firwmare");
+
     if (DetectCard())
     {
-        // lcd_displayString("det");
+        lcd_displayString("Detected");
 
         DIO_vWritePin(PORTA, PIN5, HIGH);
         TIMER0_Delay_ms_with_Blocking(500);
@@ -90,16 +112,13 @@ void MP_vRFID()
             DIO_vWritePin(PORTC, PIN6, HIGH);
             TIMER0_Delay_ms_with_Blocking(500);
             DIO_vWritePin(PORTC, PIN6, LOW);
-            TIMER0_Delay_ms_with_Blocking(500);
+            // TIMER0_Delay_ms_with_Blocking(500);
             lcd_goto(LCD_LINE_1, LCD_COL_1);
             lcd_displayString("ID IS RIGHT");
             lcd_goto(LCD_LINE_3, LCD_COL_1);
-            lcd_displayString("DOOR OPEN    ");
+            lcd_displayString("DOOR OPEN");
 
-            Servo_vSetAngle(0);
-            TIMER0_Delay_ms_with_Blocking(500);
-            Servo_vSetAngle(90);
-            TIMER0_Delay_ms_with_Blocking(500);
+            status = true;
         }
         else
         {
@@ -112,31 +131,49 @@ void MP_vRFID()
             DIO_vWritePin(PORTC, PIN6, LOW);
             TIMER0_Delay_ms_with_Blocking(500);
             lcd_goto(LCD_LINE_3, LCD_COL_1);
-            lcd_displayString("ID IS WRONG    ");
+            lcd_displayString("ID IS WRONG");
+            status = false;
         }
     }
     else if (!DetectCard())
     {
+        lcd_displayString("Not Detected");
+
         DIO_vWritePin(PORTA, PIN6, HIGH);
         TIMER0_Delay_ms_with_Blocking(500);
         DIO_vWritePin(PORTA, PIN6, LOW);
         TIMER0_Delay_ms_with_Blocking(500);
+        status = false;
     }
+    return status;
 }
-#endif
-
+void MP_vUpdateSystem(bool fp_status, bool rfid_status)
+{
+    if (fp_status && rfid_status)
+        DIO_vWritePin(SYS_ENABLE_PORT, SYS_ENABLE_PIN, HIGH);
+    else
+        DIO_vWritePin(SYS_ENABLE_PORT, SYS_ENABLE_PIN, LOW);
+}
 void MP_vStart()
 {
-    // read temp
     MP_vInit();
 
-    // fp , display state on oled
-    MP_vFingerPrint();
-
+    bool fp_status = false;
+    bool rfid_status = false;
+    fp_status = MP_vFingerPrint();
     while (1)
     {
-        // MP_vRFID();
+        if (fp_status)
+        {
+            if (rfid_status)
+                MP_vUpdateSystem(fp_status, rfid_status);
+            else
+                rfid_status = MP_vRFID();
+        }
+        else
+            fp_status = MP_vFingerPrint();
 
-        // update OLED
+        TIMER0_Delay_ms_with_Blocking(200);
+        lcd_clearAndHome();
     }
 }

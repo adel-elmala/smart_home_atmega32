@@ -1,7 +1,7 @@
 #ifndef MEGA_PROJECT_H
 #define MEGA_PROJECT_H
 
-#include "../LIB/Datatypes.h"
+#include "../../LIB/Datatypes.h"
 typedef struct MP_SYS_STATE
 {
     /* data */

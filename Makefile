@@ -1,4 +1,5 @@
 mcu1_hal = ./HAL/FingerPrint/FP.c ./HAL/OLED/OLED.c ./HAL/RFID/RFID.c ./HAL/LCD/LCD.c
+# mcu1_hal = ./HAL/FingerPrint/FP.c ./HAL/RFID/RFID.c ./HAL/LCD/LCD.c
 
 mcu1_mcal = ./MCAL/EEPROM_Internal/EEPROM.c  ./MCAL/I2C/I2C.c\
 			./MCAL/SPI/SPI.c ./MCAL/UART/UART.c ./MCAL/TIMER/timer.c ./MCAL/GIE/GIE.c ./MCAL/DIO/dio.c
@@ -21,9 +22,9 @@ F_CPU = 16000000UL
 
 HFUSE_BITS = 0xc2
 HFUSE = hfuse:w:$(HFUSE_BITS):m
-AVRDUDE_ARGS = HFUSE
+AVRDUDE_ARGS = $(HFUSE)
 
-CFLAGS = -Os -ggdb -Wall -mmcu=$(MCU) -DF_CPU=$(F_CPU)  
+CFLAGS = -Os  -Wall -mmcu=$(MCU) -DF_CPU=$(F_CPU)  
 CFLAGS += -Wno-pointer-sign -Wno-strict-aliasing #disable pointer mismatch warning
 
 INCLUDE  = -I./utils

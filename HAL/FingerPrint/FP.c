@@ -18,7 +18,6 @@
 //     UART_8BIT_CHAR_SIZE,                            // uint8 frame_data_bits_size;
 //     UART_DISABLE_PARITY,                            // uint8 parity_mode;
 //     UART_1_BIT_STOP                                 // uint8 stop_bits_mode;
-
 // };
 
 UART_Config_t uart_conf_fp_async = {
