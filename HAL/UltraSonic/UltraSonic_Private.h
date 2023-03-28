@@ -1,0 +1,18 @@
+#ifndef ULTRASONIC_PRIVATE_H
+#define ULTRASONIC_PRIVATE_H
+
+#include "../../MCAL/DIO/DIO_REG.h"
+
+#define ULTRASONIC_TRIGGER_PORT PORTA
+#define ULTRASONIC_TRIGGER_PIN PIN0
+
+#define ULTRASONIC_ECHO_PORT PORTD
+#define ULTRASONIC_ECHO_PIN PIN2
+
+#define PERSON_ENTERING 0
+#define PERSON_EXITING 1
+#define PERSON_UNDEFINED 2
+
+void Ultrasonic_trigger();
+
+#endif

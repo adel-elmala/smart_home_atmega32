@@ -5,9 +5,17 @@
 #include "../../HAL/RFID/RFID.h"
 #include "../../HAL/OLED/OLED_Interface.h"
 #include "../../HAL/LCD/LCD_Interface.h"
+#include "../../HAL/LCD/LCD_Interface.h"
+#include "../../HAL/UltraSonic/UltraSonic_Interface.h"
+#include "../../HAL/UltraSonic/UltraSonic_Private.h"
 
 #include "../../MCAL/SPI/SPI.h"
 #include "../../MCAL/TIMER/timer.h"
+
+#include <stdio.h>
+
+uint16 g_distance = 0;
+uint16 g_count = 0;
 
 void MP_vInit_FIRST_TIME()
 {
@@ -35,13 +43,74 @@ void MP_vInit()
 
     DIO_vSetPinDirection(SYS_ENABLE_PORT, SYS_ENABLE_PIN, OUTPUT);
     DIO_vSetPinDirection(SYS_SHUTDOWN_PORT, SYS_SHUTDOWN_PIN, OUTPUT);
+    DIO_vWritePin(SYS_ENABLE_PORT, SYS_ENABLE_PIN, LOW);
+    DIO_vWritePin(SYS_SHUTDOWN_PORT, SYS_SHUTDOWN_PIN, LOW);
 
-    // rfid pins
-    DIO_vSetPinDirection(PORTA, PIN4, OUTPUT);
-    DIO_vSetPinDirection(PORTA, PIN5, OUTPUT);
-    DIO_vSetPinDirection(PORTA, PIN6, OUTPUT);
     DIO_vSetPinDirection(PORTC, PIN6, OUTPUT);
 }
+
+#if 1
+uint8 MP_vUltrasonic_Person_State()
+{
+    uint16 current_distance;
+    uint16 last_distance;
+
+    last_distance = Ultrasonic_Read_Distance();
+    TIMER0_Delay_ms_with_Blocking(100);
+    current_distance = Ultrasonic_Read_Distance();
+
+    if (current_distance < last_distance) // closing in
+        return PERSON_ENTERING;
+
+    else if (current_distance > last_distance) // moving away
+        return PERSON_EXITING;
+
+    else
+        return PERSON_UNDEFINED;
+}
+#endif
+#if 1
+void MP_vUpdate_count_state_dist()
+{
+    g_distance = Ultrasonic_Read_Distance();
+}
+#endif
+#if 1
+void MP_vUpdate_count_state()
+{
+    uint8 person_state = MP_vUltrasonic_Person_State();
+    if (person_state == PERSON_ENTERING)
+        g_count++;
+    else if (person_state == PERSON_EXITING)
+        g_count--;
+
+    if (g_count < 3)
+    {
+        // yellow led on
+        DIO_vWritePin(PORTA, PIN6, HIGH);
+        DIO_vWritePin(PORTA, PIN5, LOW);
+        DIO_vWritePin(PORTA, PIN4, LOW);
+    }
+
+    else if ((g_count >= 3) && (g_count < 10))
+    {
+        // blue led on
+
+        DIO_vWritePin(PORTA, PIN6, LOW);
+        DIO_vWritePin(PORTA, PIN5, HIGH);
+        DIO_vWritePin(PORTA, PIN4, LOW);
+    }
+
+    else
+    {
+        // green led on
+
+        DIO_vWritePin(PORTA, PIN6, LOW);
+        DIO_vWritePin(PORTA, PIN5, LOW);
+        DIO_vWritePin(PORTA, PIN4, HIGH);
+    }
+}
+#endif
 
 bool MP_vFingerPrint()
 {
@@ -80,31 +149,18 @@ bool MP_vRFID()
 {
     // const uint32 IDVALUE=0X495BCAB1;
     // const uint32 IDVALUE = 0XE979E9B3;
-    const uint32 IDVALUE = 0X73643d6;
     // const uint32 IDVALUE = 0X77f6f1d8;
+    const uint32 IDVALUE = 0X73643d6;
     uint8 CardId[4] = {0, 0, 0, 0};
     uint8 Status_ID = 0;
     bool status = false;
-    // lcd_displayString("rfid");
 
-    if (getFirmwareVersion() == 0x92)
-    {
-        DIO_vWritePin(PORTA, PIN4, HIGH);
-        TIMER0_Delay_ms_with_Blocking(500);
-        DIO_vWritePin(PORTA, PIN4, LOW);
-        TIMER0_Delay_ms_with_Blocking(500);
-    }
-
-    // lcd_displayString("firwmare");
+    while (getFirmwareVersion() != 0x92)
+        ;
 
     if (DetectCard())
     {
         lcd_displayString("Detected");
-
-        DIO_vWritePin(PORTA, PIN5, HIGH);
-        TIMER0_Delay_ms_with_Blocking(500);
-        DIO_vWritePin(PORTA, PIN5, LOW);
-        TIMER0_Delay_ms_with_Blocking(500);
         Status_ID = GetCardId(CardId);
         uint32 IDX = ((uint32)(CardId[3])) | ((uint32)(CardId[2]) << 8) | ((uint32)(CardId[1]) << 16) | ((uint32)(CardId[0]) << 24);
         if (IDX == IDVALUE)
@@ -138,19 +194,27 @@ bool MP_vRFID()
     else if (!DetectCard())
     {
         lcd_displayString("Not Detected");
-
-        DIO_vWritePin(PORTA, PIN6, HIGH);
-        TIMER0_Delay_ms_with_Blocking(500);
-        DIO_vWritePin(PORTA, PIN6, LOW);
-        TIMER0_Delay_ms_with_Blocking(500);
         status = false;
     }
     return status;
 }
-void MP_vUpdateSystem(bool fp_status, bool rfid_status)
+void MP_vUpdateSystem(bool fp, bool rfid, bool shutdown)
 {
-    if (fp_status && rfid_status)
+    if (rfid && fp)
+    {
         DIO_vWritePin(SYS_ENABLE_PORT, SYS_ENABLE_PIN, HIGH);
+        TIMER0_Delay_ms_with_Blocking(500);
+        DIO_vWritePin(SYS_ENABLE_PORT, SYS_ENABLE_PIN, LOW);
+        TIMER0_Delay_ms_with_Blocking(500);
+    }
+    else if (shutdown == true)
+    {
+        DIO_vWritePin(SYS_SHUTDOWN_PORT, SYS_SHUTDOWN_PIN, HIGH);
+        TIMER0_Delay_ms_with_Blocking(500);
+        DIO_vWritePin(SYS_SHUTDOWN_PORT, SYS_SHUTDOWN_PIN, LOW);
+        TIMER0_Delay_ms_with_Blocking(500);
+    }
+
     else
         DIO_vWritePin(SYS_ENABLE_PORT, SYS_ENABLE_PIN, LOW);
 }
@@ -160,20 +224,46 @@ void MP_vStart()
 
     bool fp_status = false;
     bool rfid_status = false;
+
     fp_status = MP_vFingerPrint();
     while (1)
     {
-        if (fp_status)
+        if (fp_status == true)
         {
-            if (rfid_status)
-                MP_vUpdateSystem(fp_status, rfid_status);
+            if (rfid_status == true)
+            {
+                MP_vUpdateSystem(fp_status, rfid_status, false);
+                lcd_displayString("all done");
+            }
             else
                 rfid_status = MP_vRFID();
         }
         else
             fp_status = MP_vFingerPrint();
 
-        TIMER0_Delay_ms_with_Blocking(200);
+        lcd_displayString("ultra");
+        MP_vUltraSonic();
+
+        TIMER0_Delay_ms_with_Blocking(600);
+        lcd_clearAndHome();
+    }
+}
+
+void MP_vUltraSonic()
+{
+    char str[16] = {0};
+    TIMER0_SetConfig();
+    lcd_init();
+    Ultrasonic_Init();
+
+    if (g_count == 0)
+        MP_vUpdateSystem(false, false, true);
+    else
+    {
+        MP_vUpdate_count_state();
+        sprintf(str, "%d", g_count);
+        lcd_displayString(str);
+        TIMER0_Delay_ms_with_Blocking(600);
         lcd_clearAndHome();
     }
 }

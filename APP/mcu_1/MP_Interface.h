@@ -14,5 +14,6 @@ typedef struct MP_SYS_STATE
 void MP_vInit();
 void MP_vStart();
 void MP_vInit_FIRST_TIME();
+void MP_vUltraSonic();
 
 #endif
